@@ -7,7 +7,7 @@ import time
 open_message="          ______________________\n\n          N-Dimensional Snake \n          ______________________\n\n Unstoppable, autonomous, always has room to grow. \n\n     Runs into a corner? Adds a new dimension. \n \n     ___________________________________\n"
 
 WINDOW_SIZE = 600
-GRID_SIZE = 3
+GRID_SIZE = 3   #change boxes dimensions per dimension
 CELL_SIZE = WINDOW_SIZE // GRID_SIZE
 FPS = 100
 dimrec=0
@@ -179,7 +179,7 @@ def main():
             sys.exit()
 
         # ---------------------------
-        # 4. Draw the game
+        # 4. Draw the game     **(Uncomment to see top 2D slice of the INF D Snake)**
         # ---------------------------
         '''screen.fill((0, 0, 0))  # black background
 
