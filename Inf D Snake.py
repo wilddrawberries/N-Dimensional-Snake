@@ -1,4 +1,4 @@
-import pygame
+#import pygame
 import sys
 import random
 from collections import deque
