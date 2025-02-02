@@ -1,4 +1,4 @@
-#import pygame
+import pygame
 import sys
 import random
 from collections import deque
@@ -7,7 +7,7 @@ import time
 open_message="          ______________________\n\n          N-Dimensional Snake \n          ______________________\n\n Unstoppable, autonomous, always has room to grow. \n\n     Runs into a corner? Adds a new dimension. \n \n     ___________________________________\n"
 
 WINDOW_SIZE = 600
-GRID_SIZE = 3   #change boxes dimensions per dimension
+GRID_SIZE = 3
 CELL_SIZE = WINDOW_SIZE // GRID_SIZE
 FPS = 100
 dimrec=0
@@ -34,6 +34,40 @@ def in_bounds(coord, dim):
         if c < 0 or c >= GRID_SIZE:
             return False
     return True
+def greedy_path_nd(obstacles, start, goal, dim):
+    if start == goal:
+        return [start]
+
+    visited = set([start])
+    parent = {start: None}
+    queue = [start]  # Priority queue (sorted manually)
+    dirs = generate_directions(dim)
+
+    while queue:
+        # Sort queue by Manhattan distance to goal (smallest first)
+        queue.sort(key=lambda x: sum(abs(a - b) for a, b in zip(x, goal)))
+        current = queue.pop(0)
+
+        for d in dirs:
+            neighbor = tuple(c + dc for c, dc in zip(current, d))
+            if (neighbor not in visited and 
+                in_bounds(neighbor, dim) and 
+                neighbor not in obstacles):
+
+                visited.add(neighbor)
+                parent[neighbor] = current
+                queue.append(neighbor)
+
+                if neighbor == goal:
+                    # Reconstruct the path
+                    path = []
+                    n = neighbor
+                    while n is not None:
+                        path.append(n)
+                        n = parent[n]
+                    return path[::-1]
+
+    return []
 
 def bfs_path_nd(obstacles, start, goal, dim):
     if start == goal:
@@ -130,7 +164,7 @@ def main():
         if not path_cache or snake[0] != path_cache[0]:
             if len(snake[0])>dimrec or len(snake)>lenrec+1000 or framecount>1000000:
                 then =time.time()
-            path_cache = bfs_path_nd(obstacles, snake[0], food, current_dim)
+            path_cache = greedy_path_nd(obstacles, snake[0], food, current_dim)
             #if len(snake[0])>dimrec or len(snake)>lenrec+1000 or framecount>1000000:
                 #print(time.time()-then) 
             
@@ -160,7 +194,7 @@ def main():
             
             if len(snake[0])>dimrec:
                 print('\n','* ',len(snake[0]),"D Snake trapped in a ",GRID_SIZE," ", (len(snake[0])-1)*('x '+str(GRID_SIZE)+' '), 'Box.','\n',sep='')  # <-- Add this line to print the head's coordinates
-            print('Length of Snake:',len(snake),'points long.')
+            print('Length of Snake:',len(snake),' zero dimensional points long.')
             dimrec=len(snake[0])
              
             lenrec=len(snake)
@@ -179,7 +213,7 @@ def main():
             sys.exit()
 
         # ---------------------------
-        # 4. Draw the game     **(Uncomment to see top 2D slice of the INF D Snake)**
+        # 4. Draw the game
         # ---------------------------
         '''screen.fill((0, 0, 0))  # black background
 
